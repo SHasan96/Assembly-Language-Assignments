@@ -1,0 +1,53 @@
+     1                                  ; NAME		Saif Hasan
+     2                                  ; Assignment	Program 2 : Adding Integers
+     3                                  ; Date		October 6, 2021
+     4                                  ; Etc...	Sleeping is good.
+     5                                  
+     6                                  SECTION .data
+     7                                  ; define data/variables here.  Think DB, DW, DD, DQ
+     8                                  
+     9                                  
+    10                                  SECTION .bss
+    11                                  ; define uninitialized data here
+    12                                  
+    13                                  SECTION .text
+    14                                  global _main
+    15                                  _main:
+    16                                  
+    17                                  ; put your code here.
+    18 00000000 66B887A9                mov AX, 0A987h
+    19 00000004 6689C3                  mov BX, AX
+    20 00000007 6601D8                  add AX, BX
+    21 0000000A 66B8CDAB                mov AX, 0ABCDh
+    22 0000000E 66BB01EF                mov BX, 0EF01h
+    23 00000012 6601D8                  add AX, BX
+    24 00000015 66B8FAFA                mov AX, 0FAFAh
+    25 00000019 66BB0505                mov BX, 0505h
+    26 0000001D 6601D8                  add AX, BX
+    27 00000020 66B8F080                mov AX, 80F0h
+    28 00000024 66BB00FF                mov BX, 0FF00h
+    29 00000028 6601D8                  add AX, BX
+    30 0000002B 66B86824                mov AX, 2468h
+    31 0000002F 66BB98DB                mov BX, 0DB98h
+    32 00000033 6601D8                  add AX, BX
+    33 00000036 66B80F00                mov AX, 000Fh
+    34 0000003A 66BBF17F                mov BX, 7FF1h
+    35 0000003E 6601D8                  add AX, BX
+    36 00000041 66B83412                mov AX, 1234h
+    37 00000045 66BB5476                mov BX, 7654h
+    38 00000049 6601D8                  add AX, BX
+    39 0000004C 66B80B0B                mov AX, 0B0Bh
+    40 00000050 66BB1EA1                mov BX, 0A11Eh
+    41 00000054 6601D8                  add AX, BX
+    42 00000057 66B85476                mov AX, 7654h
+    43 0000005B 66BB9A78                mov BX, 789Ah
+    44 0000005F 6601D8                  add AX, BX
+    45 00000062 66B80080                mov AX, 8000h
+    46 00000066 6689C3                  mov BX, AX
+    47 00000069 6601D8                  add AX, BX
+    48                                  
+    49                                  
+    50                                  ; Normal termination code
+    51 0000006C B801000000              mov eax, 1
+    52 00000071 BB00000000              mov ebx, 0
+    53 00000076 CD80                    int 80h
