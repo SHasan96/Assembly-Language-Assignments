@@ -1,0 +1,42 @@
+     1                                  ; Namme         Saif Hasan
+     2                                  ; CSC 322       20 October 2021
+     3                                  ; Assignment    Program 5 : Max Fibonacci
+     4                                  ; Description   This program calculates the largest, unsigned fibonacci number that can fit into a double word on our machine.
+     5                                  
+     6                                  SECTION .data
+     7                                  
+     8                                  
+     9                                  SECTION .bss
+    10 00000000 <res 00000004>          MaxFib:	  RESD 1
+    11 00000004 <res 00000002>          FibCount: RESW 1 
+    12                                  
+    13                                  
+    14                                  SECTION .text
+    15                                  global _main
+    16                                  _main:
+    17                                  
+    18                                  ; put first two values (0, 1) into 2 registers to start off
+    19 00000000 B800000000              mov eax, 0
+    20 00000005 BB01000000              mov ebx, 1
+    21 0000000A 66C705[04000000]02-     mov word [FibCount], 2 ;;start with 2 since we hard code the first 2 numbers of the sequence
+    22 00000012 00                 
+    23                                                         ;; note that this is the count and not the n value
+    24                                  
+    25                                  startLoop:
+    26 00000013 89C1                      mov ecx, eax
+    27 00000015 01D9                      add ecx, ebx
+    28 00000017 720D                      jc maxFound
+    29 00000019 89D8                      mov eax, ebx
+    30 0000001B 89CB                      mov ebx, ecx
+    31 0000001D 66FF05[04000000]          inc word [FibCount]
+    32 00000024 EBED                      jmp startLoop
+    33                                  
+    34                                  maxFound: ;; when we find the max fibonacci number of double size
+    35 00000026 891D[00000000]            mov [MaxFib], ebx
+    36                                  
+    37                                  lastBreak:
+    38                                  
+    39                                  ; Normal termination code
+    40 0000002C B801000000              mov eax, 1
+    41 00000031 BB00000000              mov ebx, 0
+    42 00000036 CD80                    int 80h
