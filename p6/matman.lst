@@ -1,0 +1,109 @@
+     1                                  ; Name          Saif Hasan
+     2                                  ; CSC 322       1 November 2021
+     3                                  ; Assignment    Program 6 : Matrix Management
+     4                                  ; Description   This program calculates the sums of each row, each column and grand total of all the elements in an arbritrarily defined matrix
+     5                                  
+     6                                  
+     7                                  ROWS:      EQU  5;3      
+     8                                  COLS:      EQU  7;2   
+     9                                  
+    10                                  ;;; the code should work for every matrix if the ROWS and COLS are redefined accordingly, as long as the element in the matrix are word size
+    11                                  ;;; even if the elements are not word size, simple adjustments can make sure that it will work for other data sizes as well
+    12                                  SECTION .data
+    13                                  ;;;TestCase1
+    14                                  ;MyMatrix:       dw      1,   2
+    15                                  ;                dw      4,  -2
+    16                                  ;                dw     -10,  8
+    17                                  
+    18                                  ;;;TextCase2
+    19 00000000 010002000300040005-     MyMatrix: 	dw	 1,  2,  3,  4,  5,  6,  7
+    20 00000009 0006000700         
+    21 0000000E 080009000A000B000C-     	    	dw	 8,  9, 10, 11, 12, 13, 14
+    22 00000017 000D000E00         
+    23 0000001C 0F0010001100120013-     		dw	15, 16, 17, 18, 19, 20, 21
+    24 00000025 0014001500         
+    25 0000002A 16001700180019001A-     		dw	22, 23, 24, 25, 26, 27, 28
+    26 00000033 001B001C00         
+    27 00000038 1D001E001F00200021-     		dw	29, 30, 31, 32, 33, 34, 35
+    28 00000041 0022002300         
+    29                                  
+    30                                  
+    31                                  SECTION .bss
+    32 00000000 <res 0000000A>          RowSums:	RESW ROWS
+    33 0000000A <res 0000000E>          ColSums:	RESW COLS
+    34 00000018 <res 00000002>          Sum:		RESW 1
+    35                                  
+    36                                  ;extra variables that I used
+    37 0000001A <res 00000004>          saveECX:	RESD 1
+    38 0000001E <res 00000004>          colCount:       RESD 1 		       ;this is used to keep track of the columns when finding ColSums
+    39                                  
+    40                                  SECTION .text
+    41                                  global _main
+    42                                  _main:
+    43                                  
+    44                                  ;let's find row sums first
+    45 00000000 BA00000000              mov edx, 0
+    46 00000005 BB00000000              mov ebx, 0
+    47                                  
+    48 0000000A B905000000              mov ecx, ROWS 
+    49                                  outer1:
+    50 0000000F 890D[1A000000]             mov dword [saveECX], ecx
+    51 00000015 66B80000                   mov ax, 0
+    52 00000019 B907000000                 mov ecx, COLS 			 ;no. of cols is elements of the row 
+    53                                  
+    54                                     inner1:
+    55 0000001E 660382[00000000]             add ax, [MyMatrix + edx]   
+    56 00000025 83C202                       add edx, 2 			 ;add 2 because data size is word (2 bytes)
+    57 00000028 E2F4                       loop inner1
+    58 0000002A 8B0D[1A000000]             mov ecx, [saveECX]
+    59 00000030 668983[00000000]           mov word[RowSums + ebx], ax
+    60 00000037 83C302                     add ebx, 2
+    61 0000003A E2D3                    loop outer1
+    62                                  
+    63                                  rowsDone:
+    64                                  
+    65                                  
+    66 0000003C 31C9                    xor ecx, ecx
+    67                                  ;now for column sums
+    68 0000003E BA00000000              mov edx, 0
+    69 00000043 BB00000000              mov ebx, 0
+    70                                  
+    71 00000048 C705[1E000000]0000-     mov dword [colCount], 0
+    72 00000050 0000               
+    73 00000052 B907000000              mov ecx, COLS
+    74                                  outer2:
+    75 00000057 890D[1A000000]             mov dword [saveECX], ecx
+    76 0000005D 66B80000                   mov ax, 0
+    77 00000061 B905000000                 mov ecx, ROWS                         ;no. of rows is elements of the column
+    78                                  
+    79                                     inner2:
+    80 00000066 660382[00000000]             add ax, [MyMatrix + edx]
+    81 0000006D 83C20E                       add edx, COLS*2                      
+    82 00000070 E2F4                       loop inner2
+    83                                  
+    84 00000072 8305[1E000000]02           add dword [colCount], 2
+    85 00000079 8B15[1E000000]             mov edx, [colCount]		 	  ;every time a column sum is found we move to the next column
+    86 0000007F 8B0D[1A000000]             mov ecx, [saveECX]
+    87 00000085 668983[0A000000]           mov word[ColSums + ebx], ax
+    88 0000008C 83C302                     add ebx, 2
+    89 0000008F E2C6                    loop outer2
+    90                                  
+    91                                  colsDone:
+    92                                  
+    93 00000091 31C9                    xor ecx, ecx
+    94                                  ;total sum can simply be found from summing up RowSums (or ColSums)
+    95 00000093 BA00000000              mov edx, 0
+    96 00000098 66B80000                mov ax, 0
+    97 0000009C B905000000              mov ecx, ROWS
+    98                                  sumUp:
+    99 000000A1 660382[00000000]          add ax, [RowSums + edx]
+   100 000000A8 83C202                    add edx, 2
+   101 000000AB E2F4                    loop sumUp
+   102 000000AD 66A3[18000000]          mov word[Sum], ax
+   103                                  
+   104                                  lastBreak:
+   105                                  
+   106                                  ; Normal termination code
+   107 000000B3 B801000000              mov eax, 1
+   108 000000B8 BB00000000              mov ebx, 0
+   109 000000BD CD80                    int 80h
