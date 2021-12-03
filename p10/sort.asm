@@ -28,9 +28,6 @@ h1len:  equ ($ - h1)
 h2:    db "Sorted Array", 10, 0
 h2len: equ ($ - h2)
 
-;carriage return character
-cr:  db 0ah
-
 ;clear screen control characters
 cls:     db      1bh, '[2J'
 clsLen:  equ     ($-cls)
@@ -55,16 +52,12 @@ print h1, h1len		;printing first header
 
 ;calling toString which will convert array numbers into string 
 test2:
-mov edx, 0
-mov ecx, numslen/2
-original:
-  push edx
-  push nums
-  call _toString
-  add esp, 8
-  print printfield, 6
-  add edx, 2
-loop original
+push numslen/2
+push nums
+call _toString
+add esp, 8
+
+
 
 ;we want to call a function with 2 parameters 
 ;calling sort
@@ -73,8 +66,13 @@ push nums
 call _sort
 add esp, 8
 
-;now we will print the sorted array in a similar fashion  		              
-
+;print sorted array
+print h2, h2len
+push numslen/2
+push nums
+call _toString
+add esp, 8
+          
 lastBreak:
 ; Normal termination code
 mov eax, 1
@@ -122,36 +120,42 @@ push ebp
 mov ebp, esp
 push ebx
 mov esi, [ebp+8]	;array pointer
-mov edi, [ebp+12]
+mov ecx, [ebp+12]       
+top:
   ;get the 1st digit from the right (1th place digit)
-  xor   ax, ax
-  mov   ax, word[esi+edi]       ;the dividend in ax  ;i dont understand why i can't traverse through the array this way
-  mov   bl, 10		        ;the divisor in bl
-  div   bl			;number in ax/10
-  add   ah, '0'
-  mov	byte[printfield+4], ah
+  xor   eax, eax
+  xor   dx, dx
+  mov   ax, word[esi]         ;the dividend in dx:ax
+  mov   bx,  10		        ;the divisor in bx
+  div   bx			;we get quotient in ax, remainder in dx
+  add   dx, '0'
+  mov	byte[printfield+4], dl 
   ;get 10th place digit
-  movzx ax, al                
-  div   bl                      
-  add   ah, '0'
-  mov   byte[printfield+3], ah
+  xor dx, dx               
+  div bx
+  add dx, '0'
+  mov byte[printfield+3], dl
   ;get 100th place digit
-  movzx ax, al
-  div   bl
-  add   ah, '0'
-  mov   byte[printfield+2], ah
+  xor dx, dx
+  div bx
+  add dx, '0'
+  mov byte[printfield+2], dl
   ;get 1000th place digit
-  movzx ax, al
-  div   bl
-  add   ah, '0'
-  mov   byte[printfield+1], ah
+  xor dx, dx
+  div bx
+  add dx, '0'
+  mov byte[printfield+1], dl
   ;get 10000th place digit
-  movzx ax, al
-  div   bl
-  add   ah, '0'
-  mov   byte[printfield], ah
+  xor dx, dx
+  div bx
+  add dx, '0'
+  mov byte[printfield], dl
   ;put space
   mov   byte[printfield+5], 0Ah
+  ;print and increse offset
+  print printfield, 6
+  add esi, 2
+loop top  
 pop ebx
 pop ebp
 ret

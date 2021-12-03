@@ -14,180 +14,186 @@
     14                                     popa
     15                                  %endmacro
     16                                  
-    17                                  ;;;another simple macro for zeroing out a register
-    18                                  %macro clear 1
-    19                                     xor %1, %1
-    20                                  %endmacro
-    21                                  
+    17                                  
+    18                                  SECTION .data
+    19 00000000 D007B80B0000FFFF00-     nums:	   dw	 2000, 3000, 0, 65535, 0, 1, 2, 3, 100
+    20 00000009 000100020003006400 
+    21                                  numslen:   EQU	 ($-nums)
     22                                  
-    23                                  SECTION .data
-    24 00000000 D007B80B0000FFFF00-     nums:	   dw	 2000, 3000, 0, 65535, 0, 1, 2, 3, 100
-    25 00000009 000100020003006400 
-    26                                  numslen:   EQU	 ($-nums)
-    27                                  
-    28                                  ;;;;;;;;;;;;;;extra data
-    29                                  ;first header
-    30 00000012 4F726967696E616C20-     h1:     db "Original Array", 10, 0
-    31 0000001B 41727261790A00     
-    32                                  h1len:  equ ($ - h1)
+    23                                  ;;;;;;;;;;;;;;extra data
+    24                                  ;first header
+    25 00000012 4F726967696E616C20-     h1:     db "Original Array", 10, 0
+    26 0000001B 41727261790A00     
+    27                                  h1len:  equ ($ - h1)
+    28                                  
+    29                                  ;second header
+    30 00000022 536F72746564204172-     h2:    db "Sorted Array", 10, 0
+    31 0000002B 7261790A00         
+    32                                  h2len: equ ($ - h2)
     33                                  
-    34                                  ;second header
-    35 00000022 536F72746564204172-     h2:    db "Sorted Array", 10, 0
-    36 0000002B 7261790A00         
-    37                                  h2len: equ ($ - h2)
-    38                                  
-    39                                  ;carriage return character
-    40 00000030 0A                      cr:  db 0ah
-    41                                  
-    42                                  ;clear screen control characters
-    43 00000031 1B5B324A                cls:     db      1bh, '[2J'
-    44                                  clsLen:  equ     ($-cls)
-    45                                  
-    46                                  ;cursor position control characters
-    47 00000035 1B5B                    pos0    db      1bh, '['
-    48 00000037 30                              db      '0'
-    49 00000038 3B                              db      ';'
-    50 00000039 30                              db      '0'
-    51 0000003A 48                              db      'H'
-    52                                  
-    53                                  ;print field to store the string
-    54                                  printfield:   db  ""		;for each number we will use 6 characters (5 digits then a space)
-    55                                  
-    56                                  SECTION .text
-    57                                  global _main, _sort, _toString
-    58                                  _main:
-    59                                  print cls, clsLen	;clearing the screen
-    60 00000000 60                  <1>  pusha
-    61 00000001 B804000000          <1>  mov eax, 4
-    62 00000006 BB01000000          <1>  mov ebx, 1
-    63 0000000B B9[31000000]        <1>  mov ecx, %1
-    64 00000010 BA04000000          <1>  mov edx, %2
-    65 00000015 CD80                <1>  int 80h
-    66 00000017 61                  <1>  popa
-    67                                  print pos0, 6           ;moving the cursor to the original position
-    68 00000018 60                  <1>  pusha
-    69 00000019 B804000000          <1>  mov eax, 4
-    70 0000001E BB01000000          <1>  mov ebx, 1
-    71 00000023 B9[35000000]        <1>  mov ecx, %1
-    72 00000028 BA06000000          <1>  mov edx, %2
-    73 0000002D CD80                <1>  int 80h
-    74 0000002F 61                  <1>  popa
-    75                                  print h1, h1len		;printing first header
-    76 00000030 60                  <1>  pusha
-    77 00000031 B804000000          <1>  mov eax, 4
-    78 00000036 BB01000000          <1>  mov ebx, 1
-    79 0000003B B9[12000000]        <1>  mov ecx, %1
-    80 00000040 BA10000000          <1>  mov edx, %2
-    81 00000045 CD80                <1>  int 80h
-    82 00000047 61                  <1>  popa
+    34                                  ;clear screen control characters
+    35 00000030 1B5B324A                cls:     db      1bh, '[2J'
+    36                                  clsLen:  equ     ($-cls)
+    37                                  
+    38                                  ;cursor position control characters
+    39 00000034 1B5B                    pos0    db      1bh, '['
+    40 00000036 30                              db      '0'
+    41 00000037 3B                              db      ';'
+    42 00000038 30                              db      '0'
+    43 00000039 48                              db      'H'
+    44                                  
+    45                                  ;print field to store the string
+    46                                  printfield:   db  ""		;for each number we will use 6 characters (5 digits then a space)
+    47                                  
+    48                                  SECTION .text
+    49                                  global _main, _sort, _toString
+    50                                  _main:
+    51                                  print cls, clsLen	;clearing the screen
+    52 00000000 60                  <1>  pusha
+    53 00000001 B804000000          <1>  mov eax, 4
+    54 00000006 BB01000000          <1>  mov ebx, 1
+    55 0000000B B9[30000000]        <1>  mov ecx, %1
+    56 00000010 BA04000000          <1>  mov edx, %2
+    57 00000015 CD80                <1>  int 80h
+    58 00000017 61                  <1>  popa
+    59                                  print pos0, 6           ;moving the cursor to the original position
+    60 00000018 60                  <1>  pusha
+    61 00000019 B804000000          <1>  mov eax, 4
+    62 0000001E BB01000000          <1>  mov ebx, 1
+    63 00000023 B9[34000000]        <1>  mov ecx, %1
+    64 00000028 BA06000000          <1>  mov edx, %2
+    65 0000002D CD80                <1>  int 80h
+    66 0000002F 61                  <1>  popa
+    67                                  print h1, h1len		;printing first header
+    68 00000030 60                  <1>  pusha
+    69 00000031 B804000000          <1>  mov eax, 4
+    70 00000036 BB01000000          <1>  mov ebx, 1
+    71 0000003B B9[12000000]        <1>  mov ecx, %1
+    72 00000040 BA10000000          <1>  mov edx, %2
+    73 00000045 CD80                <1>  int 80h
+    74 00000047 61                  <1>  popa
+    75                                  
+    76                                  
+    77                                  ;calling toString which will convert array numbers into string 
+    78                                  test2:
+    79 00000048 6A09                    push numslen/2
+    80 0000004A 68[00000000]            push nums
+    81 0000004F E886000000              call _toString
+    82 00000054 83C408                  add esp, 8
     83                                  
     84                                  
-    85                                  ;calling toString which will convert array numbers into string 
-    86                                  test2:
-    87 00000048 BA00000000              mov edx, 0
-    88 0000004D B909000000              mov ecx, numslen/2
-    89                                  original:
-    90 00000052 52                        push edx
-    91 00000053 68[00000000]              push nums
-    92 00000058 E87C000000                call _toString
-    93 0000005D 83C408                    add esp, 8
-    94                                    print printfield, 6
-    95 00000060 60                  <1>  pusha
-    96 00000061 B804000000          <1>  mov eax, 4
-    97 00000066 BB01000000          <1>  mov ebx, 1
-    98 0000006B B9[3B000000]        <1>  mov ecx, %1
-    99 00000070 BA06000000          <1>  mov edx, %2
-   100 00000075 CD80                <1>  int 80h
-   101 00000077 61                  <1>  popa
-   102 00000078 83C202                    add edx, 2
-   103 0000007B E2D5                    loop original
-   104                                  
-   105                                  ;we want to call a function with 2 parameters 
-   106                                  ;calling sort
-   107 0000007D 6A09                    push numslen/2		;size is word(2 bytes), so divide by 2
-   108 0000007F 68[00000000]            push nums
-   109 00000084 E80F000000              call _sort
-   110 00000089 83C408                  add esp, 8
-   111                                  
-   112                                  ;now we will print the sorted array in a similar fashion  		              
+    85                                  
+    86                                  ;we want to call a function with 2 parameters 
+    87                                  ;calling sort
+    88 00000057 6A09                    push numslen/2		;size is word(2 bytes), so divide by 2
+    89 00000059 68[00000000]            push nums
+    90 0000005E E836000000              call _sort
+    91 00000063 83C408                  add esp, 8
+    92                                  
+    93                                  ;print sorted array
+    94                                  print h2, h2len
+    95 00000066 60                  <1>  pusha
+    96 00000067 B804000000          <1>  mov eax, 4
+    97 0000006C BB01000000          <1>  mov ebx, 1
+    98 00000071 B9[22000000]        <1>  mov ecx, %1
+    99 00000076 BA0E000000          <1>  mov edx, %2
+   100 0000007B CD80                <1>  int 80h
+   101 0000007D 61                  <1>  popa
+   102 0000007E 6A09                    push numslen/2
+   103 00000080 68[00000000]            push nums
+   104 00000085 E850000000              call _toString
+   105 0000008A 83C408                  add esp, 8
+   106                                            
+   107                                  lastBreak:
+   108                                  ; Normal termination code
+   109 0000008D B801000000              mov eax, 1
+   110 00000092 BB00000000              mov ebx, 0
+   111 00000097 CD80                    int 80h
+   112                                  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    113                                  
-   114                                  lastBreak:
-   115                                  ; Normal termination code
-   116 0000008C B801000000              mov eax, 1
-   117 00000091 BB00000000              mov ebx, 0
-   118 00000096 CD80                    int 80h
-   119                                  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   120                                  
-   121                                  ;;;;;;;;;;;;;;;;;;;;;sort in ascending order
-   122                                  _sort:
-   123 00000098 55                      push ebp
-   124 00000099 89E5                    mov ebp, esp
-   125 0000009B 53                      push ebx
-   126 0000009C BA00000000              mov edx, 0		;offset
-   127 000000A1 8B7508                  mov esi, [ebp+8]	;array pointer
-   128 000000A4 8B4D0C                  mov ecx, [ebp+12]       ;array length
-   129 000000A7 49                      dec ecx
-   130 000000A8 BA00000000              mov edx, 0
-   131                                  
-   132                                  outer:
-   133 000000AD 51                        push ecx
-   134                                    inner:
-   135 000000AE 668B0416                    mov ax, word[esi+edx]
-   136 000000B2 668B5C1602                  mov bx, word[esi+edx+2]
-   137 000000B7 6639D8                      cmp ax, bx
-   138 000000BA 7702                        ja swap
-   139 000000BC EB0B                        jmp next
-   140                                      swap:
-   141 000000BE 6693                          xchg ax, bx
-   142 000000C0 66890416                      mov word[esi+edx], ax
-   143 000000C4 66895C1602                    mov word[esi+edx+2], bx
-   144                                      next:
-   145 000000C9 83C202                        add edx, 2
-   146 000000CC E2E0                      loop inner
-   147 000000CE 59                        pop ecx
-   148 000000CF BA00000000                mov edx, 0
-   149 000000D4 E2D7                    loop outer
-   150                                  
-   151 000000D6 5B                      pop ebx
-   152 000000D7 5D                      pop ebp
-   153 000000D8 C3                      ret
-   154                                  
-   155                                  ;;;;;;;;;;;;;;;;;function to convert integers into a string for printing 
-   156                                  _toString:
-   157 000000D9 55                      push ebp
-   158 000000DA 89E5                    mov ebp, esp
-   159 000000DC 53                      push ebx
-   160 000000DD 8B7508                  mov esi, [ebp+8]	;array pointer
-   161 000000E0 8B7D0C                  mov edi, [ebp+12]
-   162                                    ;get the 1st digit from the right (1th place digit)
-   163 000000E3 6631C0                    xor   ax, ax
-   164 000000E6 668B043E                  mov   ax, word[esi+edi]         ;the dividend in ax  ;i dont understand why i can't traverse through the array this way
-   165 000000EA B30A                      mov   bl, 10		        ;the divisor in bh
-   166 000000EC F6F3                      div   bl			;number in ax/10
-   167 000000EE 80C430                    add   ah, '0'
-   168 000000F1 8825[3F000000]            mov	byte[printfield+4], ah
-   169                                    ;get 10th place digit
-   170 000000F7 660FB6C0                  movzx ax, al                
-   171 000000FB F6F3                      div   bl                      
-   172 000000FD 80C430                    add   ah, '0'
-   173 00000100 8825[3E000000]            mov   byte[printfield+3], ah
-   174                                    ;get 100th place digit
-   175 00000106 660FB6C0                  movzx ax, al
-   176 0000010A F6F3                      div   bl
-   177 0000010C 80C430                    add   ah, '0'
-   178 0000010F 8825[3D000000]            mov   byte[printfield+2], ah
-   179                                    ;get 1000th place digit
-   180 00000115 660FB6C0                  movzx ax, al
-   181 00000119 F6F3                      div   bl
-   182 0000011B 80C430                    add   ah, '0'
-   183 0000011E 8825[3C000000]            mov   byte[printfield+1], ah
-   184                                    ;get 10000th place digit
-   185 00000124 660FB6C0                  movzx ax, al
-   186 00000128 F6F3                      div   bl
-   187 0000012A 80C430                    add   ah, '0'
-   188 0000012D 8825[3B000000]            mov   byte[printfield], ah
-   189                                    ;put space
-   190 00000133 C605[40000000]0A          mov   byte[printfield+5], 0Ah
-   191 0000013A 5B                      pop ebx
-   192 0000013B 5D                      pop ebp
-   193 0000013C C3                      ret
+   114                                  ;;;;;;;;;;;;;;;;;;;;;sort in ascending order
+   115                                  _sort:
+   116 00000099 55                      push ebp
+   117 0000009A 89E5                    mov ebp, esp
+   118 0000009C 53                      push ebx
+   119 0000009D BA00000000              mov edx, 0		;offset
+   120 000000A2 8B7508                  mov esi, [ebp+8]	;array pointer
+   121 000000A5 8B4D0C                  mov ecx, [ebp+12]       ;array length
+   122 000000A8 49                      dec ecx
+   123 000000A9 BA00000000              mov edx, 0
+   124                                  
+   125                                  outer:
+   126 000000AE 51                        push ecx
+   127                                    inner:
+   128 000000AF 668B0416                    mov ax, word[esi+edx]
+   129 000000B3 668B5C1602                  mov bx, word[esi+edx+2]
+   130 000000B8 6639D8                      cmp ax, bx
+   131 000000BB 7702                        ja swap
+   132 000000BD EB0B                        jmp next
+   133                                      swap:
+   134 000000BF 6693                          xchg ax, bx
+   135 000000C1 66890416                      mov word[esi+edx], ax
+   136 000000C5 66895C1602                    mov word[esi+edx+2], bx
+   137                                      next:
+   138 000000CA 83C202                        add edx, 2
+   139 000000CD E2E0                      loop inner
+   140 000000CF 59                        pop ecx
+   141 000000D0 BA00000000                mov edx, 0
+   142 000000D5 E2D7                    loop outer
+   143                                  
+   144 000000D7 5B                      pop ebx
+   145 000000D8 5D                      pop ebp
+   146 000000D9 C3                      ret
+   147                                  
+   148                                  ;;;;;;;;;;;;;;;;;function to convert integers into a string for printing 
+   149                                  _toString:
+   150 000000DA 55                      push ebp
+   151 000000DB 89E5                    mov ebp, esp
+   152 000000DD 53                      push ebx
+   153 000000DE 8B7508                  mov esi, [ebp+8]	;array pointer
+   154 000000E1 8B4D0C                  mov ecx, [ebp+12]       
+   155                                  top:
+   156                                    ;get the 1st digit from the right (1th place digit)
+   157 000000E4 31C0                      xor   eax, eax
+   158 000000E6 6631D2                    xor   dx, dx
+   159 000000E9 668B06                    mov   ax, word[esi]         ;the dividend in dx:ax
+   160 000000EC 66BB0A00                  mov   bx,  10		        ;the divisor in bx
+   161 000000F0 66F7F3                    div   bx			;we get quotient in ax, remainder in dx
+   162 000000F3 6683C230                  add   dx, '0'
+   163 000000F7 8815[3E000000]            mov	byte[printfield+4], dl 
+   164                                    ;get 10th place digit
+   165 000000FD 6631D2                    xor dx, dx               
+   166 00000100 66F7F3                    div bx
+   167 00000103 6683C230                  add dx, '0'
+   168 00000107 8815[3D000000]            mov byte[printfield+3], dl
+   169                                    ;get 100th place digit
+   170 0000010D 6631D2                    xor dx, dx
+   171 00000110 66F7F3                    div bx
+   172 00000113 6683C230                  add dx, '0'
+   173 00000117 8815[3C000000]            mov byte[printfield+2], dl
+   174                                    ;get 1000th place digit
+   175 0000011D 6631D2                    xor dx, dx
+   176 00000120 66F7F3                    div bx
+   177 00000123 6683C230                  add dx, '0'
+   178 00000127 8815[3B000000]            mov byte[printfield+1], dl
+   179                                    ;get 10000th place digit
+   180 0000012D 6631D2                    xor dx, dx
+   181 00000130 66F7F3                    div bx
+   182 00000133 6683C230                  add dx, '0'
+   183 00000137 8815[3A000000]            mov byte[printfield], dl
+   184                                    ;put space
+   185 0000013D C605[3F000000]0A          mov   byte[printfield+5], 0Ah
+   186                                    ;print and increse offset
+   187                                    print printfield, 6
+   188 00000144 60                  <1>  pusha
+   189 00000145 B804000000          <1>  mov eax, 4
+   190 0000014A BB01000000          <1>  mov ebx, 1
+   191 0000014F B9[3A000000]        <1>  mov ecx, %1
+   192 00000154 BA06000000          <1>  mov edx, %2
+   193 00000159 CD80                <1>  int 80h
+   194 0000015B 61                  <1>  popa
+   195 0000015C 83C602                    add esi, 2
+   196 0000015F E283                    loop top  
+   197 00000161 5B                      pop ebx
+   198 00000162 5D                      pop ebp
+   199 00000163 C3                      ret
