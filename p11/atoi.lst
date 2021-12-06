@@ -1,0 +1,92 @@
+     1                                  ;Name           Saif Hasan
+     2                                  ;Date           3  December 2021
+     3                                  ;Assignment     Program 11 : Atoi Procedure
+     4                                  ;Description    Converts a string (of numeric characters) to its integer representation
+     5                                  
+     6                                  SECTION .data
+     7 00000000 00                      ascii1: db 0
+     8 00000001 313800                  ascii2: db "18",0	; You may need to replace these quotes on assemble.
+     9 00000004 33323200                ascii3: db "322",0
+    10 00000008 343239343936373239-     ascii4: db "4294967295",0
+    11 00000011 3500               
+    12 00000013 303030303000            ascii5: db "00000",0
+    13                                  
+    14                                  SECTION .text
+    15                                  global _main, _times10, _atoi, _atoi1
+    16                                  _main:
+    17                                  
+    18                                  ;test values
+    19                                  ;mov ebx, 100
+    20                                  ;mov ecx, 100
+    21                                  ;mov edx, 100
+    22                                  
+    23                                  
+    24 00000000 BE[00000000]            mov esi,ascii1
+    25 00000005 E840000000              call _atoi
+    26                                  b1:
+    27                                  
+    28 0000000A BE[01000000]            mov esi,ascii2
+    29 0000000F E836000000              call _atoi
+    30                                  b2:
+    31                                  
+    32 00000014 BE[04000000]            mov esi,ascii3
+    33 00000019 E82C000000              call _atoi
+    34                                  b3:
+    35                                  
+    36 0000001E BE[08000000]            mov esi,ascii4
+    37 00000023 E822000000              call _atoi
+    38                                  b4:
+    39                                  
+    40 00000028 BE[13000000]            mov esi,ascii5
+    41 0000002D E818000000              call _atoi
+    42                                  b5:
+    43                                  
+    44                                  lastBreak:
+    45                                  ; Normal termination code
+    46 00000032 B801000000              mov eax, 1
+    47 00000037 BB00000000              mov ebx, 0
+    48 0000003C CD80                    int 80h
+    49                                  
+    50                                  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    51                                  
+    52                                  ;;Function to multiply number by 10 and return value in eax
+    53                                  _times10:
+    54 0000003E 53                         push ebx
+    55 0000003F 89C3                       mov ebx, eax         
+    56 00000041 D1E3                       shl ebx,1        
+    57 00000043 C1E003                     shl eax,3        
+    58 00000046 01D8                       add eax,ebx       
+    59 00000048 5B                         pop ebx
+    60 00000049 C3                         ret             
+    61                                  
+    62                                  ;;Array to integer function  
+    63                                  _atoi:
+    64 0000004A 53                         push ebx
+    65 0000004B 52                         push edx
+    66 0000004C 51                         push ecx
+    67 0000004D 31D2                       xor edx, edx
+    68 0000004F 803E00                     cmp byte[esi], 0
+    69 00000052 7420                       je skip
+    70 00000054 8A16                       mov dl, [esi]
+    71 00000056 83EA30                     sub edx, '0'
+    72                                     top:
+    73 00000059 807E0100                	cmp byte[esi+1], 0
+    74 0000005D 741A                            je done
+    75 0000005F 89D0                    	mov eax, edx
+    76 00000061 E8D8FFFFFF              	call _times10
+    77 00000066 89C2                    	mov edx, eax
+    78 00000068 31C0                    	xor eax, eax
+    79 0000006A 8A4601                  	mov al, [esi+1]
+    80 0000006D 2C30                    	sub al, '0'
+    81 0000006F 01C2                    	add edx, eax
+    82 00000071 46                      	inc esi
+    83 00000072 EBE5                    	jmp top
+    84                                     skip:
+    85 00000074 BA00000000                 	mov edx, 0
+    86                                     done:
+    87 00000079 89D0                            mov eax, edx
+    88 0000007B 5B                              pop ebx
+    89 0000007C 5A                              pop edx
+    90 0000007D 59                              pop ecx
+    91 0000007E C3                         ret
+    92                                  
